@@ -1,0 +1,62 @@
+
+Домашнее задание для урока 3:
+
+Задание 1: Пусть в таблице users поля created_at и updated_at оказались незаполненными. Заполните их текущей датой и временем.
+По данной задаче решение и  комментерии даны на в файле shop в строках 49-60. При этом не удалось изменить значение в столбцах просто ч
+через update, пришлось изменять таблицу и вставлять значения по новой.
+Задание 2 
+
+
+/* 
+Решение 2 задачи, испробованы следующие способы конвертации данных из строчного формата в дату 
+но ни один не сработал в том числе указанные в методички (полностью код взят из методички)
+
+
+alter table users change created_at created_at datetime;
+
+SELECT STR_TO_DATE(created_at, '%d/%m/%Y') from users; 
+
+UPDATE users SET new_date = STR_TO_DATE(created_at, '%d/%m/%Y');
+select * from users;
+select name, date_format(created_at, '%d/%m/%Y') from users;
+
+select date_format('20.10.2017 8:13', 'На дворе %Y Год');
+
+select date_format('20.10.2017 8:13', created_at) from users;
+select unix_timestamp(created_at) from users;
+
+
+Задание 3: В таблице складских запасов storehouse_products в поле value могут встречаться самые разные цифры ......  Необходимо отсортировать записи таким образом 
+чтобы они выводились в апорядке увеличения значения value, однако нулевые запасы должны выводиться в конце
+
+Вот КОД который в файле указна на строках 143-150:
+/* Вот способы решения которые пробовал но они не работают, был расчет на способ указанный в строке 148,
+ 
+то есть в новом столбце нулевым значениям присвоить большое значение и далее сортировать по возрастанию 
+но данный код не работает*/
+ ALTER TABLE storehouses_products
+   ADD COLUMN new_value int;
+
+
+update storehouses_products set new_value = if(value > 0, value, 10000);
+
+select *, if(value > 0, value, 10000) as status from storehouses_products order by value asc, status asc;
+
+
+
+
+Задание 4: Подсчитайте средний возраст пользователей
+
+Вот решение, вроде считает правильно, в файле Mysql на строках 33-37
+SELECT
+  
+  AVG(TIMESTAMPDIFF(YEAR, birthday_at, NOW())) AS avg_age
+FROM
+  users;
+
+Задание 5: Подсчитате количество дней рождения которые приходятся на каждую из дней недели
+
+В таблицу Users добавлено поле  dayname_at varchar(255) as (DAYNAME(birthday_at)),
+  по которому потом делелась группировка и расчет
+Само решение в 35 строке select dayname_at, count(dayname_at) from users group by dayname_at;
+
